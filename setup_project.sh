@@ -12,7 +12,7 @@ error()   { echo -e "${RED}[ERROR]${RESET} $*"; }
 
 echo -e "${BOLD}"
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║      Student Attendance Tracker — Project Factory    ║"
+echo "║         Student Attendance Tracker                  ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo -e "${RESET}"
 
