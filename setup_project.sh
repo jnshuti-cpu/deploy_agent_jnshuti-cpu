@@ -12,7 +12,7 @@ error()   { echo -e "${RED}[ERROR]${RESET} $*"; }
 
 echo -e "${BOLD}"
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║         Student Attendance Tracker                  ║"
+echo "║         Student Attendance Tracker                   ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo -e "${RESET}"
 
@@ -49,8 +49,23 @@ cleanup_on_interrupt() {
 trap cleanup_on_interrupt SIGINT
 
 info "Creating directory structure…"
-mkdir -p "${PROJECT_DIR}/Helpers"
-mkdir -p "${PROJECT_DIR}/reports"
+
+if [[ -d "$PROJECT_DIR" ]]; then
+    error "Directory '${PROJECT_DIR}' already exists. Choose a different identifier."
+    exit 1
+fi
+
+if ! mkdir -p "${PROJECT_DIR}/Helpers" 2>/dev/null; then
+    error "Permission denied — cannot create '${PROJECT_DIR}'. Check your folder permissions."
+    exit 1
+fi
+
+if ! mkdir -p "${PROJECT_DIR}/reports" 2>/dev/null; then
+    error "Permission denied — cannot create reports folder."
+    rm -rf "$PROJECT_DIR"
+    exit 1
+fi
+
 success "Directories created."
 
 info "Copying source files…"
@@ -67,18 +82,25 @@ echo ""
 read -rp "$(echo -e "Would you like to update the thresholds? ${BOLD}[y/N]${RESET}: ")" UPDATE_THRESHOLDS
 
 if [[ "$UPDATE_THRESHOLDS" == "y" || "$UPDATE_THRESHOLDS" == "Y" ]]; then
+
     while true; do
         read -rp "  Enter new Warning threshold (1-100, default 75): " NEW_WARNING
         NEW_WARNING="${NEW_WARNING:-75}"
-        if [[ "$NEW_WARNING" =~ ^[1-9][0-9]?$|^100$ ]]; then break
-        else warn "Please enter a whole number between 1 and 100."; fi
+        if [[ "$NEW_WARNING" =~ ^[0-9]+$ ]] && (( NEW_WARNING >= 1 && NEW_WARNING <= 100 )); then
+            break
+        else
+            warn "Invalid input. Please enter a numeric value between 1 and 100."
+        fi
     done
 
     while true; do
         read -rp "  Enter new Failure threshold (1-100, default 50): " NEW_FAILURE
         NEW_FAILURE="${NEW_FAILURE:-50}"
-        if [[ "$NEW_FAILURE" =~ ^[1-9][0-9]?$|^100$ ]]; then break
-        else warn "Please enter a whole number between 1 and 100."; fi
+        if [[ "$NEW_FAILURE" =~ ^[0-9]+$ ]] && (( NEW_FAILURE >= 1 && NEW_FAILURE <= 100 )); then
+            break
+        else
+            warn "Invalid input. Please enter a numeric value between 1 and 100."
+        fi
     done
 
     if (( NEW_FAILURE >= NEW_WARNING )); then
@@ -111,8 +133,12 @@ EXPECTED_FILES=(
 
 ALL_OK=true
 for FILE in "${EXPECTED_FILES[@]}"; do
-    if [[ -f "$FILE" ]]; then success "Found: ${FILE}"
-    else error "Missing: ${FILE}"; ALL_OK=false; fi
+    if [[ -f "$FILE" ]]; then
+        success "Found: ${FILE}"
+    else
+        error "Missing: ${FILE}"
+        ALL_OK=false
+    fi
 done
 
 $ALL_OK && success "All files validated." || warn "Some files are missing."
