@@ -16,7 +16,7 @@ echo "║      Student Attendance Tracker — Project Factory    ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo -e "${RESET}"
 
-read -rp "$(echo -e "${BOLD}Enter a project identifier (e.g. 2025_sem1):${RESET} ")" PROJECT_INPUT
+read -rp "$(echo -e "${BOLD}Enter a project identifier:${RESET} ")" PROJECT_INPUT
 
 if [[ -z "$PROJECT_INPUT" ]]; then
     error "Project identifier cannot be empty. Aborting."
