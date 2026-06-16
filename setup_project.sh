@@ -68,12 +68,77 @@ fi
 
 success "Directories created."
 
-info "Copying source files…"
-cp attendance_checker.py "${PROJECT_DIR}/attendance_checker.py"
-cp assets.csv "${PROJECT_DIR}/Helpers/assets.csv"
-cp config.json "${PROJECT_DIR}/Helpers/config.json"
-cp reports.log "${PROJECT_DIR}/reports/reports.log"
-success "All source files copied."
+info "Generating source files…"
+
+cat > "${PROJECT_DIR}/attendance_checker.py" << 'PYEOF'
+import csv
+import json
+import os
+from datetime import datetime
+
+def run_attendance_check():
+    with open('Helpers/config.json', 'r') as f:
+        config = json.load(f)
+
+    if os.path.exists('reports/reports.log'):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        os.rename('reports/reports.log', f'reports/reports_{timestamp}.log.archive')
+
+    with open('Helpers/assets.csv', mode='r') as f, open('reports/reports.log', 'w') as log:
+        reader = csv.DictReader(f)
+        total_sessions = config['total_sessions']
+
+        log.write(f"--- Attendance Report Run: {datetime.now()} ---\n")
+
+        for row in reader:
+            name = row['Names']
+            email = row['Email']
+            attended = int(row['Attendance Count'])
+
+            attendance_pct = (attended / total_sessions) * 100
+
+            message = ""
+            if attendance_pct < config['thresholds']['failure']:
+                message = f"URGENT: {name}, your attendance is {attendance_pct:.1f}%. You will fail this class."
+            elif attendance_pct < config['thresholds']['warning']:
+                message = f"WARNING: {name}, your attendance is {attendance_pct:.1f}%. Please be careful."
+
+            if message:
+                if config['run_mode'] == "live":
+                    log.write(f"[{datetime.now()}] ALERT SENT TO {email}: {message}\n")
+                    print(f"Logged alert for {name}")
+                else:
+                    print(f"[DRY RUN] Email to {email}: {message}")
+
+if __name__ == "__main__":
+    run_attendance_check()
+PYEOF
+
+cat > "${PROJECT_DIR}/Helpers/assets.csv" << 'CSVEOF'
+Email,Names,Attendance Count,Absence Count
+alice@example.com,Alice Johnson,14,1
+bob@example.com,Bob Smith,7,8
+charlie@example.com,Charlie Davis,4,11
+diana@example.com,Diana Prince,15,0
+CSVEOF
+
+cat > "${PROJECT_DIR}/Helpers/config.json" << 'JSONEOF'
+{
+    "thresholds": {
+        "warning": 75,
+        "failure": 50
+    },
+    "run_mode": "live",
+    "total_sessions": 15
+}
+JSONEOF
+
+cat > "${PROJECT_DIR}/reports/reports.log" << 'LOGEOF'
+# Attendance Tracker — Log File
+# Reports will be appended below this line.
+LOGEOF
+
+success "All source files generated."
 
 echo ""
 echo -e "${BOLD}── Attendance Threshold Configuration ──────────────────${RESET}"
