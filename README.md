@@ -1,6 +1,6 @@
-# Student Attendance Tracker 
+# Student Attendance Tracker
 
-# How to Run the Script
+## How to Run the Script
 
 1. Clone the repository:
 ```bash
@@ -23,15 +23,23 @@
 5. Choose whether to update the attendance thresholds:
    - Warning default: 75%
    - Failure default: 50%
-   - Input is validated — only numeric values between 1 and 100 are accepted
+   - Only numeric values between 1 and 100 are accepted
 
-# Error Handling
+## What the Script Does
+
+- Creates the full project directory structure automatically
+- Generates all source files internally — no external files needed
+- Updates attendance thresholds in config.json using sed
+- Validates that python3 is installed
+- Confirms all files are in the correct locations
+
+## Error Handling
 
 - If the project directory already exists, the script exits with an error and asks you to choose a different identifier
 - If folder permissions are denied, the script exits cleanly without leaving partial files
 - Invalid threshold inputs are rejected with a warning and re-prompted
 
-# How to Trigger the Archive Feature
+## How to Trigger the Archive Feature
 
 Press **Ctrl+C** at any point during script execution.
 
@@ -40,4 +48,4 @@ The script will:
 2. Delete the incomplete project directory
 3. Exit cleanly
 
-# Project Structure Created
+## Project Structure Created
