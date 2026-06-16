@@ -18,7 +18,7 @@
    ./setup_project.sh
 ```
 
-4. When prompted, enter a project identifier (e.g. `sem1_2026`).
+4. When prompted, enter a project identifier 
 
 5. Choose whether to update the attendance thresholds:
    - Warning default: 75%
@@ -49,3 +49,21 @@ The script will:
 3. Exit cleanly
 
 ## Project Structure Created
+
+attendance_tracker_{input}/
+
+├── attendance_checker.py
+
+├── Helpers/
+
+│   ├── assets.csv
+
+│   └── config.json
+
+└── reports/
+
+└── reports.log
+
+## Video Walkthrough
+
+[Link to video walkthrough](https://www.veed.io/view/0f0bb307-a47c-4f2f-8efc-300c33628700?panel=share)
